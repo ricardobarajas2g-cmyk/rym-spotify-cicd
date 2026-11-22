@@ -1,0 +1,4 @@
+# Dependencias para CI (sin scikit-learn, cuya versión se lee de models/model_info.json).
+-r requirements-container.txt
+httpx>=0.27,<1
+pytest>=8,<10

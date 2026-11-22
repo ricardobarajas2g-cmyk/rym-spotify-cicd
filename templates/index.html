@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RYM + Spotify | Predicción de álbumes favoritos</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1c2b39;background:#f4f7fb}
+*{box-sizing:border-box}main{max-width:1000px;margin:32px auto;padding:0 18px}header{margin-bottom:22px}h1{margin:0 0 7px;font-size:29px}p{line-height:1.48}small{color:#617085}
+.card{background:white;border:1px solid #dce5ec;border-radius:13px;padding:22px;box-shadow:0 2px 8px #102a4309;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}label{font-size:13px;font-weight:600;display:block;color:#394657}
+input,select{display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #bcc9d5;border-radius:7px;background:white;color:#182b3a}
+button{background:#1e5bc7;color:white;border:0;border-radius:7px;padding:12px 20px;font-weight:700;cursor:pointer;margin-top:18px}
+button:hover{background:#174aab}.secondary{background:#eef3fc;color:#2353a4}.secondary:hover{background:#e4ecfb}
+#result{white-space:pre-wrap;background:#e9f6ef;padding:16px;border-radius:9px;border-left:4px solid #238354;display:none}
+.error{background:#fff0ef!important;border-left-color:#c43b2d!important}code{font-size:13px}footer{margin:20px 0;color:#576579}
+@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:440px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body><main><header><h1>Predicción de álbumes favoritos</h1><p>RYM + Spotify · FastAPI · Práctica 7 · Docker</p><small>Modelo de clasificación: favorito = puntuación RYM 9–10. Datos personales de práctica; las predicciones son estimaciones experimentales.</small></header>
+<section class="card"><h2>1. Elegir álbum de ejemplo</h2><p>Selecciona un álbum para cargar sus características musicales. Después puedes modificarlas para estudiar la respuesta del modelo.</p>
+<label>Álbum de muestra<select id="albumSample"><option value="">— Seleccionar álbum —</option></select></label></section>
+<section class="card"><h2>2. Características del álbum</h2><form id="albumForm"><div class="grid">
+<label>Artista (solo presentación)<input name="artista" value="Ejemplo"></label>
+<label>Álbum (solo presentación)<input name="album" value="Álbum nuevo"></label>
+<label>Géneros (separados por |)<input name="generos_frecuentes" value="rock | alternative rock" required></label>
+<label>Año Spotify<input name="anio_spotify" type="number" min="1900" max="2100" step="1" value="2015" required></label>
+<label>Energía (0–1)<input name="promedio_energy" type="number" min="0" max="1" step="any" value="0.72" required></label>
+<label>Bailabilidad (0–1)<input name="promedio_danceability" type="number" min="0" max="1" step="any" value="0.52" required></label>
+<label>Acústica (0–1)<input name="promedio_acousticness" type="number" min="0" max="1" step="any" value="0.15" required></label>
+<label>Instrumentalidad (0–1)<input name="promedio_instrumentalness" type="number" min="0" max="1" step="any" value="0.22" required></label>
+<label>Valencia (0–1)<input name="promedio_valence" type="number" min="0" max="1" step="any" value="0.34" required></label>
+<label>Tempo (BPM)<input name="promedio_tempo" type="number" min="0" max="300" step="any" value="125" required></label>
+<label>Popularidad Spotify (0–100)<input name="promedio_popularity" type="number" min="0" max="100" step="any" value="40" required></label>
+<label>Volumen promedio (dB)<input name="promedio_loudness" type="number" min="-80" max="15" step="any" value="-9" required></label>
+</div><button type="submit">Predecir favorito</button></form></section>
+<section class="card"><h2>3. Respuesta del modelo</h2><p id="result">Resultado pendiente</p><small>Consulta también <a href="/docs">/docs</a> para probar la API con JSON, <a href="/health">/health</a> para verificar el servicio y <a href="/model-info">/model-info</a> para ver el modelo.</small></section>
+<footer>Los álbumes de ejemplo provienen del CSV integrado y algunos pueden haber participado en el entrenamiento. Su uso en esta página demuestra inferencia; no mide el desempeño del modelo ante música nueva.</footer></main>
+<script>
+const keys=['promedio_danceability','promedio_energy','promedio_acousticness','promedio_instrumentalness','promedio_valence','promedio_tempo','promedio_popularity','promedio_loudness'];
+const form=document.querySelector('#albumForm'), select=document.querySelector('#albumSample'), output=document.querySelector('#result');
+const show=(data,err=false)=>{output.style.display='block';output.className=err?'error':'';output.textContent=typeof data==='string'?data:JSON.stringify(data,null,2)};
+fetch('/albums?limit=40').then(r=>r.json()).then(data=>{const items=data.items;items.forEach((a,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=a.artista+' — '+a.album;select.append(o)});select.addEventListener('change',()=>{if(select.value==='')return;const a=items[Number(select.value)];for(const [k,v] of Object.entries(a))if(form.elements[k])form.elements[k].value=v;output.style.display='none'})}).catch(()=>show('Error al cargar ejemplos',true));
+form.addEventListener('submit',async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(form).entries());for(const k of keys)f[k]=Number(f[k]);f.anio_spotify=Number(f.anio_spotify);try{const r=await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(f)});const response=await r.json();show(response,!r.ok)}catch(e){show('No se pudo consultar la API: '+e.message,true)}});
+</script></body></html>

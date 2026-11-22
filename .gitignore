@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+logs/*.jsonl
+resultados/
+# CSV contiene tus calificaciones personales y no es necesario para inferencia o CI.
+data/*.csv

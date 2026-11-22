@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        SKLEARN_VERSION: ${SKLEARN_VERSION:-1.8.0}
+    image: rym-spotify-api:cicd
+    ports:
+      - "127.0.0.1:${APP_PORT:-8001}:8000"
+    environment:
+      MODEL_PATH: /app/models/champion.joblib
+      PREDICTION_LOG: /app/logs/predicciones.jsonl
+    volumes:
+      - predicciones:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: "no"
+volumes:
+  predicciones:

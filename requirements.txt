@@ -1,0 +1,4 @@
+# Práctica 8: instalar con requirements-ci.txt + versión dinámica en model_info.json.
+# Este archivo instala las dependencias generales, sin fijar sklearn.
+-r requirements-ci.txt
+# Para sklearn: python scripts/model_version.py -> pip install scikit-learn==VERSION

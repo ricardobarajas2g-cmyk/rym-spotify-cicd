@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+.env
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+logs
+scripts
+tests
+resultados
+*.zip
+*.md
+.DS_Store
+data/*.csv
+requirements.txt
+requirements-ci.txt

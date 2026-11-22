@@ -1,0 +1,11 @@
+{
+  "nombre_modelo": "logistic",
+  "tipo": "réplica local",
+  "fuente": "rym_spotify_con_generos.csv",
+  "procedencia": "replica local entrenamiento 80% de Práctica 4, seed 42",
+  "filas_entrenamiento": 488,
+  "sha256_dataset": "e479e046d3a5eec5a5cfe81720f31763f328922511b5e3e337091fa7a262f559",
+  "sklearn_version": "1.8.0",
+  "fecha_preparacion_utc": "2026-11-22T08:12:30.643456+00:00",
+  "nota": "El artefacto incluido es una réplica entrenada localmente, no el registro MLflow remoto."
+}
